@@ -1,0 +1,6 @@
+#!/Users/anuptalegaonkar/Documents/Education/NJIT/MS/IS601-Python-for-Web-API-Development/FA26-IS601851-module8_WebApplicationAndTesting/.venv/bin/python
+import sys
+from pylint import run_symilar
+if __name__ == '__main__':
+    sys.argv[0] = sys.argv[0].removesuffix('.exe')
+    sys.exit(run_symilar())
