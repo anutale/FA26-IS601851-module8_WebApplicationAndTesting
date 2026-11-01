@@ -249,6 +249,14 @@ pytest tests/e2e/
 
 The repository also includes a GitHub Actions workflow under `.github/workflows/test.yml` that runs automated validation for pushes and pull requests.
 
+## Logging
+
+The application uses Python's standard logging module at `INFO` level. Logs include timestamps and logger names, record HTTP methods, paths, response statuses, and request durations, and report arithmetic operations. Validation failures, unexpected errors, and division-by-zero attempts are logged separately. Logs are written to the process output and can be viewed in the terminal or with Docker Compose:
+
+```bash
+docker compose logs -f web
+```
+
 ## CI/CD
 
 The pipeline is designed to:

@@ -18,7 +18,10 @@ These functions can be imported and used in other modules or integrated into API
 to perform arithmetic operations based on user input.
 """
 
+import logging
 from typing import Union  # Import Union for type hinting multiple possible types
+
+logger = logging.getLogger(__name__)
 
 # Define a type alias for numbers that can be either int or float
 Number = Union[int, float]
@@ -42,6 +45,7 @@ def add(a: Number, b: Number) -> Number:
     """
     # Perform addition of a and b
     result = a + b
+    logger.info("Addition: %s + %s = %s", a, b, result)
     return result
 
 def subtract(a: Number, b: Number) -> Number:
@@ -63,6 +67,7 @@ def subtract(a: Number, b: Number) -> Number:
     """
     # Perform subtraction of b from a
     result = a - b
+    logger.info("Subtraction: %s - %s = %s", a, b, result)
     return result
 
 def multiply(a: Number, b: Number) -> Number:
@@ -84,6 +89,7 @@ def multiply(a: Number, b: Number) -> Number:
     """
     # Perform multiplication of a and b
     result = a * b
+    logger.info("Multiplication: %s * %s = %s", a, b, result)
     return result
 
 def divide(a: Number, b: Number) -> float:
@@ -113,8 +119,10 @@ def divide(a: Number, b: Number) -> float:
     # Check if the divisor is zero to prevent division by zero
     if b == 0:
         # Raise a ValueError with a descriptive message
+        logger.warning("Division rejected because the divisor is zero")
         raise ValueError("Cannot divide by zero!")
     
     # Perform division of a by b and return the result as a float
     result = a / b
+    logger.info("Division: %s / %s = %s", a, b, result)
     return result

@@ -1,3 +1,5 @@
+import logging
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -15,6 +17,22 @@ def test_get_root_serves_calculator_page(client):
     assert response.status_code == 200
     assert response.headers["content-type"].startswith("text/html")
     assert "Calculator" in response.text
+
+
+def test_api_request_is_logged(client, caplog):
+    with caplog.at_level(logging.INFO, logger="main"):
+        response = client.post("/add", json={"a": 10, "b": 5})
+
+    assert response.status_code == 200
+    assert "POST /add completed with status 200" in caplog.text
+
+
+def test_validation_error_is_logged(client, caplog):
+    with caplog.at_level(logging.WARNING, logger="main"):
+        response = client.post("/add", json={"a": "not-a-number", "b": 5})
+
+    assert response.status_code == 400
+    assert "Validation error on /add" in caplog.text
 
 
 @pytest.mark.parametrize(

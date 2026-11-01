@@ -1,3 +1,5 @@
+import logging
+
 import pytest
 
 from operations import add, divide, multiply, subtract
@@ -58,3 +60,27 @@ def test_divide(a, b, expected):
 def test_divide_by_zero_raises_value_error():
     with pytest.raises(ValueError, match="Cannot divide by zero!"):
         divide(5, 0)
+
+
+@pytest.mark.parametrize(
+    ("operation", "arguments", "log_message"),
+    [
+        (add, (2, 3), "Addition: 2 + 3 = 5"),
+        (subtract, (5, 3), "Subtraction: 5 - 3 = 2"),
+        (multiply, (2, 3), "Multiplication: 2 * 3 = 6"),
+        (divide, (6, 3), "Division: 6 / 3 = 2.0"),
+    ],
+)
+def test_successful_operations_are_logged(caplog, operation, arguments, log_message):
+    with caplog.at_level(logging.INFO, logger="operations"):
+        operation(*arguments)
+
+    assert log_message in caplog.text
+
+
+def test_division_by_zero_is_logged(caplog):
+    with caplog.at_level(logging.WARNING, logger="operations"):
+        with pytest.raises(ValueError, match="Cannot divide by zero!"):
+            divide(5, 0)
+
+    assert "Division rejected because the divisor is zero" in caplog.text
