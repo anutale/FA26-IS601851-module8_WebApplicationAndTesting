@@ -238,6 +238,15 @@ For more detailed reporting with coverage:
 pytest --cov=.
 ```
 
+### Playwright browser tests
+
+The end-to-end tests launch the application and use Chromium to exercise the calculator UI. Install the browser once, then run the tests:
+
+```bash
+python -m playwright install chromium
+pytest tests/e2e/
+```
+
 The repository also includes a GitHub Actions workflow under `.github/workflows/test.yml` that runs automated validation for pushes and pull requests.
 
 ## CI/CD
