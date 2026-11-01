@@ -1,3 +1,10 @@
+"""Integration tests for the FastAPI application and its HTTP endpoints.
+
+These tests send requests through FastAPI's in-process ``TestClient``. This
+exercises routing, request parsing and validation, arithmetic, response
+serialization, exception handlers, and request logging together.
+"""
+
 import logging
 
 import pytest
@@ -8,10 +15,12 @@ from main import app
 
 @pytest.fixture
 def client():
+    """Provide an HTTP client connected to the application without a live server."""
     return TestClient(app)
 
 
 def test_get_root_serves_calculator_page(client):
+    """The root route should return the calculator's HTML page."""
     response = client.get("/")
 
     assert response.status_code == 200
@@ -20,6 +29,7 @@ def test_get_root_serves_calculator_page(client):
 
 
 def test_api_request_is_logged(client, caplog):
+    """Successful requests should produce an INFO-level request log."""
     with caplog.at_level(logging.INFO, logger="main"):
         response = client.post("/add", json={"a": 10, "b": 5})
 
@@ -28,6 +38,7 @@ def test_api_request_is_logged(client, caplog):
 
 
 def test_validation_error_is_logged(client, caplog):
+    """Invalid request data should return 400 and produce a warning log."""
     with caplog.at_level(logging.WARNING, logger="main"):
         response = client.post("/add", json={"a": "not-a-number", "b": 5})
 
@@ -36,6 +47,7 @@ def test_validation_error_is_logged(client, caplog):
 
 
 @pytest.mark.parametrize(
+    # Each row describes an HTTP request and the JSON result expected from it.
     ("endpoint", "payload", "expected"),
     [
         ("/add", {"a": 10, "b": 5}, {"result": 15.0}),
@@ -45,6 +57,7 @@ def test_validation_error_is_logged(client, caplog):
     ],
 )
 def test_arithmetic_endpoints(client, endpoint, payload, expected):
+    """Each arithmetic route should return its calculation in JSON."""
     response = client.post(endpoint, json=payload)
 
     assert response.status_code == 200
@@ -52,6 +65,7 @@ def test_arithmetic_endpoints(client, endpoint, payload, expected):
 
 
 def test_divide_by_zero_returns_error(client):
+    """Division by zero should be translated to the API's 400 error response."""
     response = client.post("/divide", json={"a": 10, "b": 0})
 
     assert response.status_code == 400
@@ -59,6 +73,8 @@ def test_divide_by_zero_returns_error(client):
 
 
 @pytest.mark.parametrize(
+    # Include invalid types and missing fields, and identify the field expected
+    # in the validation error returned by the application's exception handler.
     ("endpoint", "payload", "expected_error"),
     [
         ("/add", {"a": "ten", "b": 5}, "a"),
@@ -68,6 +84,7 @@ def test_divide_by_zero_returns_error(client):
     ],
 )
 def test_invalid_payload_returns_validation_error(client, endpoint, payload, expected_error):
+    """Malformed inputs should return status 400 and identify the bad field."""
     response = client.post(endpoint, json=payload)
 
     assert response.status_code == 400
